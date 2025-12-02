@@ -1,24 +1,26 @@
- Network Traffic Collector & Analyzer
+📡 Network Traffic Collector & Analyzer
 
-An advanced, containerized network traffic collection system built with Python, Flask, and Redis. designed to capture, analyze, and store network packets in real-time.
+An advanced, containerized network traffic collection system built with Python 3.12, FastAPI, and Redis. Designed to capture, analyze, and store network packets in real-time using Sigma Rules for threat detection.
 
- Key Features
+🚀 Key Features
 
 Real-time Collection: Efficiently captures network packets via customized collectors.
 
+Threat Detection: Integrates Sigma Rules (pySigma, sigmatools) for automated threat analysis.
+
 Data Pipeline: Utilizes Redis for high-performance message queuing and data buffering.
 
-Storage: Persists analyzed data into a local SQLite database (with Litestream support for replication).
+Storage: Persists analyzed data using Litestream for SQLite replication and backup.
 
 Containerized: Fully Dockerized architecture for easy deployment.
 
-REST API: Provides endpoints for health monitoring and data retrieval.
+REST API: Provides endpoints for health monitoring and data retrieval using FastAPI.
 
- Architecture
+🛠️ Architecture
 
 The system consists of the following microservices:
 
-Collector: The core Python application that handles packet ingestion and processing.
+Collector: The core Python application that handles packet ingestion, rule matching (Sigma), and processing.
 
 Redis: Acts as a broker between the ingestion layer and the storage layer.
 
@@ -34,24 +36,22 @@ Installation & Running
 
 Clone the repository:
 
-git clone [https://github.com/your-username/network-traffic-collector.git](https://github.com/your-username/network-traffic-collector.git)
-cd network-traffic-collector
+git clone [https://github.com/YOUR_USERNAME/Network-Traffic-Collector.git](https://github.com/YOUR_USERNAME/Network-Traffic-Collector.git)
+cd Network-Traffic-Collector
 
 
 Start the services:
-Run the following command to build and start the containers:
+Run the following command to build and start the containers. This will automatically install all dependencies (including pyyaml, croniter, sigmatools).
 
-docker-compose up --build -d
+docker-compose up --build
 
 
 Verify installation:
-Check the logs to ensure everything is running smoothly:
+Once the logs show Application startup complete, access the health endpoint:
 
-docker-compose logs -f collector
+Health Check: http://localhost:8000/health
 
-
-Access the health endpoint:
-http://localhost:8000/health
+API Documentation: http://localhost:8000/docs
 
 ⚙️ Configuration
 
@@ -73,7 +73,13 @@ JWT_SECRET_KEY
 
 Secret key for auth tokens
 
-dev_secret
+dev_secret_key
+
+ADMIN_USER_PASSWORD
+
+Default admin password
+
+admin_super_secret_123
 
 DB_URL
 
@@ -81,22 +87,24 @@ Database connection string
 
 sqlite:////app/data/sigma.db
 
- Tech Stack
+📦 Tech Stack
 
-Language: Python 3.11
+Language: Python 3.12
 
-Framework: Flask
+Web Framework: FastAPI / Starlette
 
 Dependency Management: Poetry
+
+Analysis Engine: pySigma, sigmatools
 
 Database: SQLite / Redis
 
 DevOps: Docker, Docker Compose
 
- Contributing
+🤝 Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
- License
+📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
