@@ -1,0 +1,24 @@
+[collector]
+max_buckets = 5
+max_bucket_size = "500MB"
+bucket_time_duration = "30min"  # Or any valid time string format
+port = 8000
+bucket_store = "./data"
+log_level = "DEBUG"
+bucket_start_time_delta = "5min"
+bucket_idle_time = "2min"  # If no events received for this time, the bucket is saved and removed
+cleanup_interval = "30s"  # How often the cleanup process runs (default 60 seconds)
+compaction_interval = "5min"  # How often the compaction process runs (default 300 seconds)
+metrics_interval= "1min" # How often the metrics are collected (default 60 seconds)
+bucket_duration_threshold = "2min"  # Buckets older than this will be saved and removed
+compaction_threshold = "100MB" # Files larger than this will not be compacted
+compaction_file_limit = 200 # Limit the number of files to compact at once
+
+[compaction]
+disabled = false
+
+[metrics]
+disabled = true
+
+[cleanup]
+disabled = false

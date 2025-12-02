@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+
+    <!-- Tailwind CSS -->
+    <link href="/static/tailwind.css" rel="stylesheet">
+    <!-- Link to external CSS file for custom styles -->
+    <link rel="stylesheet" href="/static/styles.css">
+    <!-- Link to the favicon -->
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <nav class="bg-gray-800">
+            <div class="mx-auto px-4">
+                <div class="flex items-center justify-between h-10">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <h1 class="text-white font-bold text-xl">Scar</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container mx-auto p-8">
+        <h1 class="text-2xl mb-4">Login</h1>
+        <form id="login-form">
+            <label for="username">Username:</label><br>
+            <input type="text" id="username" name="username" required><br><br>
+
+            <label for="password">Password:</label><br>
+            <input type="password" id="password" name="password" required><br><br>
+
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">Login</button>
+        </form>
+    </div>
+
+    <footer>
+        <p>Version: {{ version }}</p>
+    </footer>
+
+    <script src="/static/queryApp.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', loginContentLoader);
+    </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+sqlalchemy
+pandas
+pyyaml
+requests
+fastapi
+uvicorn
+psycopg2-binary

@@ -1,0 +1,92 @@
+flowchart TD
+  subgraph VMs["Environments"]
+        A1["Chimera"]
+        VM["Virtual Machines"]
+        POD["Containers"]
+  end
+  subgraph Agents["Data Collection Agents"]
+        D1["Syscalls"]
+        D2["Logs"]
+        D3["Metrics"]
+        D4["Network Packets"]
+  end
+  subgraph DataPrep["Data Preparation"]
+    direction RL
+  end
+  subgraph FL_Init["Federated Inference"]
+        Eval["Eval"]
+        FI1["Receive Global Model"]
+  end
+  subgraph FL_Training["Local Training Phase"]
+    direction TB
+        Train["Model Training"]
+        Delta["Compute Δ Params"]
+  end
+  subgraph FLClient["Federated Client Process"]
+    direction TB
+        FL_Init
+        FL_Training
+  end
+  subgraph Processing["Local Model Training"]
+    direction TB
+        DataPrep
+        FLClient
+  end
+  subgraph FL_Aggregation["Secure Aggregation"]
+    direction RL
+        SA4["Differential Privacy"]
+        SA1["FedAvg Algorithm"]
+  end
+  subgraph FL_Global["Global Model Management"]
+    direction RL
+        Update["Update Global Model"]
+        Dist["Distribute New Model"]
+  end
+  subgraph Trust["Federated Server Process"]
+    direction TB
+        FL_Aggregation
+        FL_Global
+  end
+  subgraph TrustIE["Trust Inference Engine"]
+        TI1["Trust Indicator Calculation"]
+        TI3["Compliance Checks"]
+        TI4["Threat Intelligence Score"]
+        TI5["Resource Usage Patterns"]
+        TI2["AI Trust Score Calculation"]
+
+        TI1 --> TI2
+        TI3 --> TI2
+        TI4 --> TI2
+        TI5 --> TI2
+  end
+  subgraph Output["Threat Analysis"]
+        IS1["CTI Generation"]
+        IS2["OpenCTI Integration"]
+        DB[("Threat Intelligence Database")]
+        IS1 --> IS2
+        IS2 --> DB
+  end
+    VM -- Agent --> A1
+    POD -- eBPF --> A1
+    A1 -- Collects --> D1 & D2 & D3 & D4
+
+    FI1 --> Eval
+    DataPrep -- Features --> Train
+    DataPrep -- Features --> Output
+    DataPrep -- Features --> TI4
+    Agents -- Raw Data --> DataPrep
+    Train --> Delta
+    Output --> TI4
+    SA1 --> SA4
+    SA4 --> Update
+    Update --> Dist
+    Dist -- New Model --> FI1
+    Eval --> TrustIE
+    TI2 --> n1["AI Trust Evaluator"]
+    style VM fill:#f9f9f9,stroke:#666
+    style FL_Init fill:#f0f8ff,stroke:#4682b4
+    style FL_Training fill:#f0fff0,stroke:#3cb371
+    style FL_Aggregation fill:#fff0f5,stroke:#db7093
+    style Agents fill:#f9f9f9,stroke:#666
+    style Trust fill:#ffe6e6,stroke:#ff6666
+    style Processing fill:#e6f3ff,stroke:#3399ff

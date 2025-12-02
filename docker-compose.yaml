@@ -1,0 +1,99 @@
+version: "3.8"
+
+# Ρυθμίσεις για τα logs (κρατάμε τις καλές πρακτικές του παλιού)
+x-default-logging: &default-logging
+  options:
+    max-size: "10m"
+    max-file: "3"
+  driver: json-file
+
+services:
+  # --- ΥΠΗΡΕΣΙΑ 1: Ο Συλλέκτης Δεδομένων (Python App) ---
+  collector:
+    # Χτίζει από τον φάκελο ./collector χρησιμοποιώντας το νέο Dockerfile που φτιάξαμε
+    build:
+      context: ./collector
+      dockerfile: Dockerfile
+    image: network-collector:latest
+    container_name: network_collector
+    restart: always
+    
+    # Αποθήκευση δεδομένων τοπικά στον φάκελο ./data του υπολογιστή σου
+    volumes:
+      - ./data:/app/data
+    
+    ports:
+      - "8000:8000"
+    
+    # Healthcheck: Ελέγχει αν η εφαρμογή ζει
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    
+    # Μεταβλητές Περιβάλλοντος (Environment Variables)
+    # Χρησιμοποιούμε σύνταξη ${VAR:-default} για να δουλεύει χωρίς .env αρχείο
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      # Ασφάλεια (Άλλαξέ τα για production)
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-my_secret_key_change_me}
+      - JWT_ALGORITHM=HS256
+      - JWT_EXPIRATION_TIME=3600
+      # Βάση Δεδομένων (Τοπική SQLite)
+      - DB_URL=sqlite:////app/data/sigma.db
+      - ADMIN_USER_PASSWORD=${ADMIN_USER_PASSWORD:-admin_super_secret_123}
+      # Litestream (Τα αφήνουμε κενά προς το παρόν για να μην κρασάρει)
+      - LITESTREAM_ACCESS_KEY_ID=${LITESTREAM_ACCESS_KEY_ID:-""}
+      - LITESTREAM_SECRET_ACCESS_KEY=${LITESTREAM_SECRET_ACCESS_KEY:-""}
+      - LITESTREAM_BUCKET=${LITESTREAM_BUCKET:-""}
+    
+    depends_on:
+      redis:
+        condition: service_healthy
+    
+    # Μειωμένοι πόροι για να τρέχει στο laptop σου (ΟΧΙ 8GB!)
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+    logging: *default-logging
+
+  # --- ΥΠΗΡΕΣΙΑ 2: Redis (Cache/Message Broker) ---
+  redis:
+    image: redis:latest
+    container_name: network_redis
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - redis_data:/data
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+    logging: *default-logging
+
+  # --- ΥΠΗΡΕΣΙΑ 3: Scarface UI (Προαιρετικό) ---
+  # Το έχω βάλει σε σχόλια (#). Αν έχεις τον κώδικα για το UI,
+  # βγάλε τα σχόλια και άλλαξε το 'image' σε 'build: ./scarface'
+  # scarface:
+  #   image: dregistry.pdmfc.com/pdm/scarface:dev  <-- ΑΥΤΟ ΘΕΛΕΙ ΑΛΛΑΓΗ ΑΝ ΤΟ ΕΝΕΡΓΟΠΟΙΗΣΕΙΣ
+  #   restart: unless-stopped
+  #   depends_on:
+  #     collector:
+  #       condition: service_healthy
+  #   environment:
+  #     - SCAR_HOST=collector
+  #     - SCAR_PORT=8000
+  #   ports:
+  #     - "4173:4173"
+
+volumes:
+  redis_data:

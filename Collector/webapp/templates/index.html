@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MQL Query Interface</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        textarea { width: 100%; height: 150px; font-family: monospace; }
+        button { margin-top: 10px; }
+        #results { margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: left; border: 1px solid #ddd; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Query Data using SQL</h1>
+    <form id="query-form">
+        <label for="sql-query">Enter SQL Query:</label><br>
+        <textarea id="sql-query" name="sql-query" placeholder="SELECT * FROM data WHERE column1 > 10 LIMIT 5"></textarea><br><br>
+        <button type="submit">Submit Query</button>
+    </form>
+
+    <div id="results">
+        <h2>Results:</h2>
+        <table id="result-table" style="display:none;">
+            <thead>
+                <tr id="table-header"></tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+        </table>
+        <pre id="result-data" style="display:none;"></pre>
+    </div>
+
+    <script>
+        document.getElementById("query-form").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const query = document.getElementById("sql-query").value;
+
+            try {
+                // Make API request to the backend
+                const response = await fetch('http://localhost:8080/query', { // Ensure this port matches the backend's
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query: query }) // Use the correct payload key
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Check if data is available
+                    if (data.length > 0) {
+                        // Show the table and hide the raw text result
+                        document.getElementById("result-table").style.display = "block";
+                        document.getElementById("result-data").style.display = "none";
+
+                        const tableHeader = document.getElementById("table-header");
+                        const tableBody = document.getElementById("table-body");
+
+                        // Clear any previous table data
+                        tableHeader.innerHTML = '';
+                        tableBody.innerHTML = '';
+
+                        // Generate table headers
+                        const headers = Object.keys(data[0]);
+                        headers.forEach(header => {
+                            const th = document.createElement("th");
+                            th.textContent = header;
+                            tableHeader.appendChild(th);
+                        });
+
+                        // Generate table rows
+                        data.forEach(row => {
+                            const tr = document.createElement("tr");
+                            headers.forEach(header => {
+                                const td = document.createElement("td");
+                                td.textContent = row[header];
+                                tr.appendChild(td);
+                            });
+                            tableBody.appendChild(tr);
+                        });
+                    } else {
+                        // If no data, display a message
+                        document.getElementById("result-data").style.display = "block";
+                        document.getElementById("result-data").textContent = "No data found.";
+                        document.getElementById("result-table").style.display = "none";
+                    }
+                } else {
+                    // Handle API errors
+                    document.getElementById("result-data").style.display = "block";
+                    document.getElementById("result-data").textContent = `Error: ${data.detail}`;
+                    document.getElementById("result-table").style.display = "none";
+                }
+            } catch (error) {
+                console.error('Error querying data:', error);
+                document.getElementById("result-data").style.display = "block";
+                document.getElementById("result-data").textContent = "Error querying data!";
+                document.getElementById("result-table").style.display = "none";
+            }
+        });
+    </script>
+</body>
+</html>

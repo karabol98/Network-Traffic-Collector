@@ -1,0 +1,12 @@
+dbs:
+  - path: ${LITESTREAM_LOCAL_DB_PATH}
+    replicas:
+      - type: s3
+        bucket: ${LITESTREAM_BUCKET}
+        endpoint: ${LITESTREAM_ENDPOINT}
+        path: ${LITESTREAM_S3_DB_PATH}
+        access-key-id: ${LITESTREAM_ACCESS_KEY_ID}
+        secret-access-key: ${LITESTREAM_SECRET_ACCESS_KEY}
+        region: us-east-1  # Any value, needed to avoid an error
+        sync-interval: 1s
+        snapshot-interval: 1h

@@ -1,0 +1,37 @@
+Python artifacts
+
+pycache/
+*.py[cod]
+*$py.class
+
+Virtual environments
+
+venv/
+env/
+myenv/
+.venv/
+
+Database
+
+*.db
+*.sqlite3
+*.sqlite
+
+Logs
+
+*.log
+logs/
+
+IDE settings
+
+.vscode/
+.idea/
+
+OS files
+
+.DS_Store
+Thumbs.db
+
+Docker
+
+docker-compose.override.yml

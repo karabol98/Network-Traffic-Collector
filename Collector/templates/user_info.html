@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Info</title>
+
+    <!-- Tailwind CSS -->
+    <link href="/static/tailwind.css" rel="stylesheet">
+    <!-- Link to external CSS file for custom styles -->
+    <link rel="stylesheet" href="/static/styles.css">
+    <!-- Link to the favicon -->
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <nav class="bg-gray-800">
+            <div class="mx-auto px-4">
+                <div class="flex items-center justify-between h-10">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <h1 class="text-white font-bold text-xl">Scar</h1>
+                        </div>
+                        <div class="hidden md:block">
+                            <div class="ml-10 flex items-baseline space-x-4">
+                                <a href="/search" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Search</a>
+                                <a href="/indexes" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Indexes</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-4 flex items-center md:ml-6">
+                            <!-- Additional header items can go here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container mx-auto p-8">
+        <h1 class="text-2xl mb-4">User Info</h1>
+
+        <p>Welcome, {{ username }}!</p>
+        <p>Your email: {{ email }}</p>
+        <p>Your roles: {{ roles }}</p>
+        <p>Your indexes: {{ indexes }}</p>
+
+    </div>
+
+    <footer>
+        <p>Version: {{ version }}</p>
+    </footer>
+</body>
+</html>

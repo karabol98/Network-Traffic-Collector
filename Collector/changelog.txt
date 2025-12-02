@@ -1,0 +1,75 @@
+20250414-0.24.4_AuditLogs - 2024-04-14 15:00
+- Implement audit logging middleware and enhance user management routes with detailed audit logs for actions
+
+20250409-0.24.3_TestsGalore - 2025-04-09 00:00
+- Correction of IndexPermissions
+- Added more unit tests
+
+20250406-0.24.2_RoleBasedPermissions - 2025-04-06 00:50
+- Implement role-based index permissions management
+- Add endpoints for updating, adding, and removing indexes for roles and users
+- Enhance user and role models to support allowed indexes
+- Refactor index filtering logic in utils
+
+20250405-0.24.1_UserManagement - 2025-04-05 18:50
+- Delete of index access from user corrected
+
+20250405-0.24.0_UserManagement - 2025-04-05 18:00
+- User management as REST WS
+- User access control to indexes and services
+- Using DB (sqlite, vould be other) for user info
+
+20250328-0.23.0_ConcatTwoAtATime - 2025-03-28 19:50
+- Concatenation of pyarrow tables from parquet, two at a time to minimize memory consuption.
+- Meta table names are now constants
+
+20250328-0.22.3_FlushBeforeQuery - 2025-03-28 17:50
+- Flushing before query
+
+20250328-0.22.2_TempParquetCleanup - 2025-03-28 15:00
+- Implemented cleanup mechanism for temporary Parquet files
+- Arrow tables only registered before the query being executed
+
+20250328-0.22.1_Parquet_SQL_Limit_Offset - 2025-03-28 14:40
+- Online buckets temporarily saved to disk to use Parquet files access method
+- Improved handling of wildcard queries
+- Improved SQL handling with sqlglot SQL parser
+- Correction of LIMIT and OFFSET support for SQL queries on Parquet files
+
+20250325-0.22.0_Schema_and_Indexes_SQL - 2025-03-25 16:30
+- Added SQL capabilities for _schema and _indexes pseudo-tables
+- Improved index handling with SQL-based queries
+
+20250324-0.21.0_History - 2025-03-24 14:45
+- Added history API for user queries
+- Added schema table retrieval
+
+20250316-0.19.0_MetricsGalore
+- Added Add metrics_interval configuration and enhance timestamp parsing functionality.
+- Added new metrics every 60s _cpu_times , _io_counters, _memory_full_info,_memory_info,_memory_maps,_net_connections,_open_files, _process, _threads
+- Old metrics index renamed to _bucket for consistency with other metrics, avoid storing all metrics in the same index as it make it harder for duckdb to reason about with lots of empty columns
+- Updated styles to use tailwind
+
+20250306-0.15.6_Healthchecks - 2025-03-06 15:10
+- Add health check endpoint and Docker health checks for services
+
+20250305-0.15.3_QueryWildcardIndexes - 2025-03-05 10:35
+- Wildcard indexes can be used.
+
+20250305-0.15.0_QueryOnlyMemory - 2025-03-05 09:10
+- Indexes only in memory can be queried.
+
+20250304-0.14.1_InternalLog - 2025-03-04
+- Internal index storing the log in _internal
+
+20250303-0.13.0_VersionOnFooter - 2025-03-03 sm:30
+- collector - /version endpoint shows current version, also in the footer of the web app
+
+20250303-0.12.0_CompactCleanupBuckets - 2025-03-03 18:28
+- BucketManager - Compact buckets will use up to 5 buckets with the
+  same start date as long as they are below a given size threshold
+  and merge them together, renaming the old files to .old.
+- BucketManager - Cleanup from memory buckets that have expired, ie,
+  the end_time, last_event_time and last_event_reception_time have
+  already passed a given threshold.
+- TaskManager - Correction of lock, hability to multitask.

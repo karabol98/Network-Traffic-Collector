@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scar</title>
+
+    <!-- Tailwind CSS -->
+    <link href="/static/tailwind.css" rel="stylesheet">
+    <!-- Link to external CSS file for custom styles -->
+    <link rel="stylesheet" href="/static/styles.css">
+    <!-- Link to the favicon -->
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+    <!-- Header with iTrust6G logo -->
+    <header>
+        <nav class="bg-gray-800">
+            <div class="mx-auto px-4">
+                <div class="flex items-center justify-between h-10">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <h1 class="text-white font-bold text-xl">Scar</h1>
+                        </div>
+                        <div class="hidden md:block">
+                            <div class="ml-10 flex items-baseline space-x-4">
+                                <a href="/search" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Search</a>
+                                <a href="/indexes" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Indexes</a>
+                                <a href="/logout" id="logout-link" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-4 flex items-center md:ml-6">
+                            <!-- Additional header items can go here -->
+                        </div>
+                    </div>
+                    <div class="-mr-2 flex md:hidden">
+                        <!-- Mobile menu button -->
+                        <button type="button" class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
+                            <span class="sr-only">Open main menu</span>
+                            <!-- Menu icon -->
+                            <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile menu, show/hide based on menu state -->
+            <div class="md:hidden" id="mobile-menu">
+                <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                    <a href="/search" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Search</a>
+                    <a href="/indexes" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Indexes</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Display error message if it exists -->
+        {% if error %}
+            <div class="error">
+                <p>{{ error }}</p>
+            </div>
+        {% endif %}
+
+        <!-- SQL query input -->
+        <label for="query">Enter your SQL query:</label><br>
+        <textarea id="query" name="query" rows="8" cols="180"></textarea><br><br>
+
+        <!-- Time Range Selector -->
+        <label for="time-range">Select Time Range:</label><br>
+        <select id="time-range" name="time-range">
+            <option value="1h">1 hour ago</option>
+            <option value="6h">6 hours ago</option>
+            <option value="12h">12 hours ago</option>
+            <option value="24h">24 hours ago</option>
+            <option value="3d">3 days ago</option>
+            <option value="7d" selected>7 days ago</option>
+            <option value="14d">14 days ago</option>
+            <option value="1m">1 month ago</option>
+            <option value="3m">3 months ago</option>
+            <option value="ytd">Year to date</option>
+            <option value="1y">1 year ago</option>
+            <option value="custom">Custom range</option>
+        </select><br><br>
+
+        <!-- Custom Time Range Input (only shown if "Custom range" is selected) -->
+        <div id="custom-time-range" style="display:none;">
+            <label for="start-date">Start Date:</label><br>
+            <input type="datetime-local" id="start-date" name="start-date"><br><br>
+            <label for="end-date">End Date:</label><br>
+            <input type="datetime-local" id="end-date" name="end-date"><br><br>
+        </div>
+
+        <!-- Run Query Button and Spinner -->
+        <button type="submit" id="run-query">Run Query</button>
+        <!-- Spinner created using CSS -->
+        <div id="loading-spinner" style="display:none;"></div>
+
+        <!-- Toggle for Table or JSON view -->
+        <button id="toggle-view">Show as JSON</button><br><br>
+
+        <h2>Results:</h2>
+
+        <!-- Display additional information, initially hidden -->
+        <div id="additional-info" style="display: none; margin-bottom: 20px; font-size: 1.2rem;">
+            <span id="events-returned"></span> of <span id="total-events"></span> in <span id="execution-time"></span> seconds
+        </div>
+
+        <!-- Display the query results as a table -->
+        <div id="table-view" style="display:block;">
+            <table id="result-table">
+                <thead>
+                    <tr>
+                        <!-- Column headers will be populated dynamically -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Table rows will be populated dynamically -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Display results as JSON -->
+        <div id="json-view" style="display:none;">
+            <table id="json-table">
+                <thead>
+                    <tr>
+                        <th>Row</th>
+                        <th>Event JSON</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- JSON rows will be populated dynamically -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- If there are no results, show a message -->
+        <div id="no-data-message" style="display: none;">
+            No data available
+        </div>
+
+    </div>
+
+    <!-- Link to external JS file -->
+    <script src="/static/queryApp.js"></script>
+
+    <script>
+        // Listen for the DOMContentLoaded event to run the script
+        document.addEventListener("DOMContentLoaded", queryContentLoader);
+        // Load history on page load
+        window.onload = fetchHistory;
+    </script>
+    <!-- show the version as a footnote -->
+    <footer>
+        <p>Version: {{ version }}</p>
+    </footer>
+</body>
+</html>

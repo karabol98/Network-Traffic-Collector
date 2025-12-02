@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parquet Query WebApp</title>
+
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" href="/static/styles.css">
+    <!-- Link to the favicon -->
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+    <!-- Header with iTrust6G logo -->
+    <header>
+        <div class="header-content">
+            <img src="/static/itrust6g-logo.png" alt="iTrust6G Logo" class="logo">
+            <h1>Parquet Query WebApp</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Display error message if it exists -->
+        {% if error %}
+            <div class="error">
+                <p>{{ error }}</p>
+            </div>
+        {% endif %}
+
+        <!-- Dropdown for selecting index -->
+        <label for="index">Select Index:</label><br>
+        <select id="index" name="index">
+            {% for index in indices %}
+                <option value="{{ index }}">{{ index }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <!-- Input for selecting specific files or '*' for all -->
+        <label for="files">Specify files (use '*' for all):</label><br>
+        <input type="text" id="files" name="files" placeholder="e.g., *.parquet"><br><br>
+
+        <!-- SQL query input -->
+        <label for="query">Enter your SQL query:</label><br>
+        <textarea id="query" name="query" rows="4" cols="50"></textarea><br><br>
+        
+        <button type="submit" id="run-query">Run Query</button>
+
+        <h2>Results:</h2>
+
+        <!-- Display the query results as a table -->
+        <table id="result-table">
+            <thead>
+                <tr>
+                    <!-- Column headers will be populated dynamically -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Table rows will be populated dynamically -->
+            </tbody>
+        </table>
+
+        <!-- If there are no results, show a message -->
+        <div id="no-data-message" style="display: none;">
+            No data available
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('run-query').addEventListener('click', async function(event) {
+            event.preventDefault();  // Prevent button's default action
+
+            const index = document.getElementById('index').value;
+            const files = document.getElementById('files').value;
+            const query = document.getElementById('query').value;
+
+            // Build the query URL dynamically based on the user inputs
+            const queryUrl = `/query?index=${encodeURIComponent(index)}&files=${encodeURIComponent(files)}&query=${encodeURIComponent(query)}`;
+
+            // Send the query to the backend API
+            const response = await fetch(queryUrl);
+            const data = await response.json();
+
+            // Handle the result or display an error
+            const resultTable = document.getElementById('result-table');
+            const resultBody = resultTable.querySelector('tbody');
+            const noDataMessage = document.getElementById('no-data-message');
+            noDataMessage.style.display = 'none';  // Hide no data message by default
+            resultBody.innerHTML = '';  // Clear previous results
+
+            if (data.error) {
+                // If there's an error, show it
+                noDataMessage.style.display = 'block';
+                noDataMessage.textContent = data.error;
+                return;
+            }
+
+            // If results exist
+            const headers = Object.keys(data.result[0]);
+            const headerRow = resultTable.querySelector('thead tr');
+            headerRow.innerHTML = '';  // Clear previous headers
+
+            // Populate headers
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header;
+                headerRow.appendChild(th);
+            });
+
+            // Populate result rows
+            data.result.forEach(row => {
+                const tr = document.createElement('tr');
+                headers.forEach(header => {
+                    const td = document.createElement('td');
+                    td.textContent = row[header];
+                    tr.appendChild(td);
+                });
+                resultBody.appendChild(tr);
+            });
+        });
+    </script>
+
+</body>
+</html>

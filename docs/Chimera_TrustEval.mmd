@@ -1,0 +1,39 @@
+
+flowchart TD
+    subgraph VMs[Environments]
+        VM[Virtual Machines] --> |Agent| A1[Chimera]
+        POD[Containers] --> |eBPF| A1[Chimera]
+    end
+
+    subgraph Agents[Data Collection Agents]
+        A1[Chimera] -->|Collects| D1[Syscalls]
+        A1[Chimera] -->|Collects| D2[Logs]
+        A1[Chimera] -->|Collects| D3[Metrics]
+        A1[Chimera] -->|Collects| D4[Network Packets]
+    end
+
+    subgraph Processing[Local Model Training]
+        Parse[Parsing] --> Filter[Filtering]
+        Filter[Filtering] --> Agg
+        Agg[Aggregation] --> Norm[Normalization]
+        Norm --> EnRich[Enrichment]
+        EnRich --> Corr[Correlation]
+    end
+
+    subgraph Trust[Trust Inference Engine]
+        
+    end
+
+  
+
+
+    Agents -->|Raw Data| Parse
+    Agents -->|Raw Data| Trust
+    Corr -->|Sightings and Structured Data| Trust
+
+
+    style VM fill:#f9f9f9,stroke:#666
+    style Agents fill:#f9f9f9,stroke:#666
+    style Processing fill:#e6f3ff,stroke:#3399ff
+    style Trust fill:#ffe6e6,stroke:#ff6666
+    style Output fill:#e6ffe6,stroke:#33cc33

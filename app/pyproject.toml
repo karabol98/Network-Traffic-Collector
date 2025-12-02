@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "app"
+version = "2025.01.17"
+description = "Displays data from parquet buckets"
+authors = ["Paulo Correia <paulo.correia@pdmfc.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+duckdb = "^1.1.3"
+python = "^3.12"
+toml = "^0.10.2"
+fastapi = "0.115.6"
+pyarrow = "18.0.0"
+pandas = "2.2.3"
+uvicorn = "0.34.0"
+Jinja2 = "3.1.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

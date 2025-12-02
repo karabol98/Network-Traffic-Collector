@@ -1,0 +1,5 @@
+[webapp]
+port = 8080
+bucket_store = "/app/data"
+log_level = "INFO" 
+

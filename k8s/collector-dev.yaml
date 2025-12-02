@@ -1,0 +1,164 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: it6g
+  name: collector-dev
+  labels:
+    app: collector-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: collector-dev
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 33%
+  template:
+    metadata:
+      labels:
+        app: collector-dev
+    spec:
+      containers:
+        - name: collector-dev
+          image: dregistry.qa.pdmfc.com/it6/collector:dev
+          imagePullPolicy: Always
+          command: ["/bin/bash", "-c"]
+          args:
+            - alembic upgrade head && python3 collector.py
+          securityContext:
+            privileged: true
+          ports:
+            - containerPort: 8000
+          resources:
+            limits:
+              memory: "8Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP  # Explicitly define HTTP scheme
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5
+          volumeMounts:
+            - name: data-volume-dev
+              mountPath: /app/data  # Mount path inside container
+          env:
+            - name: REDIS_HOST
+              value: "redis-service-dev"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: collector-dev-secrets
+                  key: JWT_SECRET_KEY
+            - name: JWT_ALGORITHM
+              valueFrom:
+                secretKeyRef:
+                  name: collector-dev-secrets
+                  key: JWT_ALGORITHM
+            - name: JWT_EXPIRATION_TIME
+              valueFrom:
+                secretKeyRef:
+                  name: collector-dev-secrets
+                  key: JWT_EXPIRATION_TIME
+            - name: DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: collector-dev-secrets
+                  key: DB_URL
+            - name: ADMIN_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: collector-dev-secrets
+                  key: ADMIN_USER_PASSWORD
+      volumes:
+        - name: data-volume-dev
+          hostPath:
+            path: /data-dev  # Path on host machine
+            type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: it6g
+  name: collector-service-dev
+spec:
+  selector:
+    app: collector-dev
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: it6g
+  name: collector-dev.k8s.itrust6g.pdmfc.com
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"  # Increased to 100 megabytes
+spec:
+  rules:
+  - host: collector-dev.k8s.itrust6g.pdmfc.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: collector-service-dev
+            port:
+              number: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: it6g
+  name: redis-dev
+  labels:
+    app: redis-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-dev
+  template:
+    metadata:
+      labels:
+        app: redis-dev
+    spec:
+      containers:
+        - name: redis
+          image: redis:latest
+          ports:
+            - containerPort: 6379
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: it6g
+  name: redis-service-dev
+spec:
+  selector:
+    app: redis-dev
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+  type: ClusterIP

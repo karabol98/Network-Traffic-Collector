@@ -1,0 +1,37 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: collector_test.py with pytest",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": [
+            "collector_test.py",
+            "-v"
+            ],
+            "cwd": "${workspaceFolder}/collector/tests",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Python Debugger: FastAPI",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "collector:app",
+                "--reload"
+            ],
+            "cwd": "${workspaceFolder}/collector",
+            "jinja": true,
+            "env": {
+                "REDIS_HOST": "localhost",
+                "REDIS_PORT": "6379"
+            }
+        }
+    ]
+}

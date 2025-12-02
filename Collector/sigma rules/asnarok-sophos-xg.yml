@@ -1,0 +1,19 @@
+title: Sophos XG Firewall Asnarok Malware Detection
+id: asnarok-sophos-xg
+status: experimental
+description: Detects exploitation of Sophos XG Firewall via Asnarok malware campaign.
+logsource:
+  product: sophos
+  service: firewall
+detection:
+  selection:
+    EventID: 4000
+    Message|contains: 'Asnarok'
+  condition: selection
+level: high
+tags:
+  - attack.initial-access
+  - attack.t1190
+  - malware.asnarok
+
+#Αυτός ο κανόνας εντοπίζει το κακόβουλο λογισμικό Asnarok που στοχεύει τα Sophos XG Firewalls μέσω μιας ευπάθειας SQL injection

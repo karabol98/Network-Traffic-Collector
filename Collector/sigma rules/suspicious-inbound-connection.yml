@@ -1,0 +1,17 @@
+title: Suspicious Inbound Connection on Firewall
+id: suspicious-inbound-connection
+status: test
+description: Detects unusual inbound connections that may indicate scanning or intrusion attempts.
+logsource:
+  product: firewall
+detection:
+  selection:
+    DestinationPort: 3389
+    SourceIP|startswith: '192.168.'
+  condition: selection
+level: high
+tags:
+  - attack.reconnaissance
+  - attack.t1046
+
+#Αυτός ο κανόνας εντοπίζει ύποπτες εισερχόμενες συνδέσεις που μπορεί να υποδηλώνουν προσπάθειες μη εξουσιοδοτημένης πρόσβασης.

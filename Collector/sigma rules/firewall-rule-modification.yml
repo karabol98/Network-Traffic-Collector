@@ -1,0 +1,18 @@
+title: Unauthorized Firewall Rule Modification
+id: firewall-rule-modification
+status: test
+description: Detects changes to firewall rules that may indicate unauthorized access or misconfiguration.
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4950
+    SubjectUserName|contains: 'admin'
+  condition: selection
+level: medium
+tags:
+  - attack.defense-evasion
+  - attack.t1562
+
+#Αυτός ο κανόνας εντοπίζει μη εξουσιοδοτημένες αλλαγές στους κανόνες του firewall, οι οποίες μπορεί να υποδηλώνουν κακόβουλη δραστηριότητα.
